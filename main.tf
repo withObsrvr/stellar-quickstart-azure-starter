@@ -1,5 +1,5 @@
 module "stellar_quickstart" {
-  source = "git::https://github.com/withobsrvr/terraform-azure-stellar-quickstart.git?ref=v0.1.0"
+  source = "git::https://github.com/withobsrvr/terraform-azure-stellar-quickstart.git?ref=v0.1.1"
 
   location            = var.location
   environment         = var.environment

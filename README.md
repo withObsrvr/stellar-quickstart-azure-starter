@@ -106,5 +106,5 @@ in your tests and pointing SDKs at the sandbox.
 
 Defaults (private mode, no VPN): roughly **$100/month** for the always-on
 container plus ~$1 for state storage. The optional VPN gateway adds
-~$140/month. `terraform destroy` when idle; redeploying takes ~5 minutes and
+~$190/month. `terraform destroy` when idle; redeploying takes ~5 minutes and
 the pipeline re-seeds automatically.

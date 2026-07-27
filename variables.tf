@@ -29,7 +29,7 @@ variable "network_access" {
 }
 
 variable "enable_vpn_gateway" {
-  description = "Deploy a Point-to-Site VPN gateway for laptop access (private mode only; ~$140/month, 30-45 min to provision)"
+  description = "Deploy a Point-to-Site VPN gateway for laptop access (private mode only; ~$190/month, 30-45 min to provision)"
   type        = bool
   default     = false
 }
