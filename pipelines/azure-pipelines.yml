@@ -1,0 +1,147 @@
+# Stellar sandbox pipeline: validate + plan on every run, apply from main
+# behind an ADO Environment approval gate (continuous delivery), then re-seed
+# test accounts.
+#
+# Continuous delivery vs deployment: the gate lives on the ADO Environment
+# named below (Pipelines > Environments > stellar-sandbox > Approvals and
+# checks). With a required approver, merges wait for a human = continuous
+# delivery. Remove the approval check and merges auto-apply = continuous
+# deployment. The YAML is identical either way.
+#
+# PR validation: Azure Repos ignores YAML `pr:` triggers — add a Build
+# Validation branch policy on main pointing at this pipeline instead
+# (Repos > Branches > main > Branch policies > Build Validation).
+
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+  - name: runSeed
+    displayName: Seed test accounts after apply
+    type: boolean
+    default: true
+  - name: seedCount
+    displayName: Number of seed accounts
+    type: number
+    default: 5
+
+variables:
+  # Name of your Azure service connection (Workload Identity federation
+  # recommended). Create under Project Settings > Service connections.
+  serviceConnection: "azure-stellar-sandbox"
+
+stages:
+  - stage: Validate
+    displayName: Validate & plan
+    jobs:
+      - job: plan
+        displayName: terraform plan
+        steps:
+          - task: AzureCLI@2
+            displayName: fmt / validate / plan
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              addSpnToEnvironment: true
+              inlineScript: |
+                set -euo pipefail
+                export ARM_CLIENT_ID="$servicePrincipalId"
+                export ARM_TENANT_ID="$tenantId"
+                export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+                if [ -n "${idToken:-}" ]; then
+                  export ARM_USE_OIDC=true ARM_OIDC_TOKEN="$idToken"
+                else
+                  export ARM_CLIENT_SECRET="$servicePrincipalKey"
+                fi
+                terraform fmt -check -recursive
+                terraform init -backend-config=backend.hcl -input=false
+                terraform validate
+                terraform plan -input=false -out=tfplan
+
+  - stage: Apply
+    displayName: Apply (main only)
+    dependsOn: Validate
+    condition: >-
+      and(succeeded(),
+          eq(variables['Build.SourceBranch'], 'refs/heads/main'),
+          ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - deployment: apply
+        displayName: terraform apply
+        # The approval gate is configured on this environment in the ADO UI.
+        environment: stellar-sandbox
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - task: AzureCLI@2
+                  displayName: plan + apply
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    addSpnToEnvironment: true
+                    inlineScript: |
+                      set -euo pipefail
+                      export ARM_CLIENT_ID="$servicePrincipalId"
+                      export ARM_TENANT_ID="$tenantId"
+                      export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+                      if [ -n "${idToken:-}" ]; then
+                        export ARM_USE_OIDC=true ARM_OIDC_TOKEN="$idToken"
+                      else
+                        export ARM_CLIENT_SECRET="$servicePrincipalKey"
+                      fi
+                      terraform init -backend-config=backend.hcl -input=false
+                      # Fresh plan at apply time: the approval gate can hold
+                      # this stage long enough for the Validate plan to go
+                      # stale.
+                      terraform plan -input=false -out=tfplan
+                      terraform apply -input=false tfplan
+
+  - stage: Seed
+    displayName: Seed test accounts
+    dependsOn: Apply
+    condition: >-
+      and(succeeded(),
+          eq('${{ parameters.runSeed }}', 'True'),
+          eq(variables['Build.SourceBranch'], 'refs/heads/main'),
+          ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - job: seed
+        displayName: fund accounts via Friendbot
+        steps:
+          - task: AzureCLI@2
+            displayName: seed accounts (az container exec)
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              addSpnToEnvironment: true
+              inlineScript: |
+                set -euo pipefail
+                export ARM_CLIENT_ID="$servicePrincipalId"
+                export ARM_TENANT_ID="$tenantId"
+                export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+                if [ -n "${idToken:-}" ]; then
+                  export ARM_USE_OIDC=true ARM_OIDC_TOKEN="$idToken"
+                else
+                  export ARM_CLIENT_SECRET="$servicePrincipalKey"
+                fi
+                terraform init -backend-config=backend.hcl -input=false
+                RG=$(terraform output -raw resource_group_name)
+                CG=$(az container list -g "$RG" --query "[0].name" -o tsv)
+                pip install --quiet -r scripts/requirements.txt
+                python3 scripts/seed_accounts.py \
+                  --count ${{ parameters.seedCount }} \
+                  --via-exec "$RG" "$CG" \
+                  --output "$(Build.ArtifactStagingDirectory)/seed-accounts.json"
+          - publish: $(Build.ArtifactStagingDirectory)/seed-accounts.json
+            artifact: seed-accounts
+            displayName: publish seed-accounts.json

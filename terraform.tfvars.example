@@ -1,0 +1,12 @@
+# Copy to terraform.tfvars and adjust. Defaults give a private sandbox on an
+# ephemeral local Stellar network.
+
+location    = "eastus"
+environment = "sandbox"
+
+# network_access     = "private"
+# enable_vpn_gateway = false
+
+# stellar_network  = "local"
+# container_cpu    = 2
+# container_memory = 8

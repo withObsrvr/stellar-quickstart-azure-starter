@@ -1,0 +1,7 @@
+# Copy to backend.hcl (or let scripts/bootstrap-state.sh generate it), then:
+#   terraform init -backend-config=backend.hcl
+resource_group_name  = "rg-tfstate"
+storage_account_name = "sttfstateCHANGEME"
+container_name       = "tfstate"
+key                  = "stellar-sandbox/terraform.tfstate"
+use_azuread_auth     = true
