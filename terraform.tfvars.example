@@ -7,6 +7,20 @@ environment = "sandbox"
 # network_access     = "private"
 # enable_vpn_gateway = false
 
+# Plan these ranges so they do not overlap your application or hub VNets.
+# vnet_cidr               = "10.10.0.0/16"
+# aci_subnet_cidr         = "10.10.1.0/24"
+# gateway_subnet_cidr     = "10.10.255.0/27"
+# vpn_client_address_pool = "172.16.201.0/24"
+# vpn_authentication_type  = "entra" # use "certificate" for Linux/OpenVPN
+# vpn_aad_audience         = "c632b3df-fb67-4d84-bdcf-b95ad541b5c8"
+# vpn_root_certificate_name = "stellar-p2s-root"
+# vpn_root_certificate_data = "<base64-encoded DER public CA certificate>"
+# additional_allowed_cidrs = ["10.20.0.0/16"]
+
+# Public mode only. The label must be unique within the Azure region.
+# dns_name_label = "stellar-demo-your-company"
+
 # stellar_network  = "local"
 # container_cpu    = 2
 # container_memory = 8

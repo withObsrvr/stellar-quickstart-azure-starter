@@ -10,8 +10,9 @@ no code changes:
 | RPC URL | `http://<endpoint>:8000/rpc` | `https://soroban-testnet.stellar.org` | (run your own) |
 | Network passphrase | `Standalone Network ; February 2017` | `Test SDF Network ; September 2015` | `Public Global Stellar Network ; September 2015` |
 
-`<endpoint>` comes from `terraform output -raw stellar_endpoint`. Friendbot
-(the faucet) is at `http://<endpoint>:8000/friendbot` on the sandbox — see the
+`<endpoint>` is the complete URL returned by `terraform output -raw
+stellar_endpoint`, including the `http://` scheme and port `8000`. Friendbot
+(the faucet) is at `<endpoint>/friendbot` on the sandbox — see the
 [module's Friendbot guide] for funding accounts, and `scripts/seed_accounts.py`
 for pre-funded test accounts.
 

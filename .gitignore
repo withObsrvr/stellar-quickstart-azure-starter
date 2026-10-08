@@ -1,6 +1,5 @@
 # Terraform
 .terraform/
-.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
 *.tfplan
@@ -20,3 +19,5 @@ seed-accounts.json
 # Python
 __pycache__/
 .venv/
+backend.hcl
+.terraform.lock.hcl

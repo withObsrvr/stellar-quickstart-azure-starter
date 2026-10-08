@@ -23,6 +23,14 @@ needs around it: remote state, pipelines, and test-data tooling.
 
 ## Setup
 
+For a complete workstation-to-deployment walkthrough—including the short-lived
+public demo, internal-only deployment, Point-to-Site VPN, VNet peering,
+verification, seeding, and cleanup—see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+Platform-specific private-access guides are available for
+[NixOS/Linux with certificate-authenticated OpenVPN](docs/NIXOS_PRIVATE_ACCESS.md)
+and [Windows/macOS with Entra-authenticated Azure VPN
+Client](docs/PRIVATE_RELEASE_WINDOWS_MACOS.md).
+
 ### 1. Import this repo into Azure DevOps
 
 Repos → Import repository → paste this repo's Git URL.
@@ -46,6 +54,9 @@ terraform init -backend-config=backend.hcl
 terraform plan -out=tfplan
 terraform apply tfplan
 ```
+
+Commit the generated `.terraform.lock.hcl` so local and pipeline runs select
+the same provider version.
 
 ### 4. Create the service connection (once)
 
