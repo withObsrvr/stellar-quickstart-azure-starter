@@ -21,3 +21,4 @@ __pycache__/
 .venv/
 backend.hcl
 .terraform.lock.hcl
+tfplan-retry
