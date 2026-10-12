@@ -21,6 +21,7 @@ module "stellar_quickstart" {
   additional_allowed_cidrs  = var.additional_allowed_cidrs
 
   stellar_network  = var.stellar_network
+  quickstart_image = var.quickstart_image
   container_cpu    = var.container_cpu
   container_memory = var.container_memory
 

@@ -12,6 +12,7 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+configs/
 
 # Seed accounts contain secret keys — never commit them
 seed-accounts.json

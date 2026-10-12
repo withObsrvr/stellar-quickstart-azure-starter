@@ -46,6 +46,12 @@ From the repository root:
   tfstate
 ```
 
+On Windows PowerShell, use:
+
+~~~powershell
+.\scripts\bootstrap-state.ps1 -Location eastus -StateResourceGroup rg-stellar-tfstate -StorageAccount ststellaryouruniqueid -Container tfstate
+~~~
+
 Azure Storage account names are globally unique, lowercase, and 3–24
 alphanumeric characters. The script creates the resource group, account, blob
 container, and your data-plane role assignment, then writes `backend.hcl`.

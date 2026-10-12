@@ -27,9 +27,23 @@ az account set --subscription "<subscription name or ID>"
 export ARM_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
 ```
 
+On Windows PowerShell, use the equivalent environment syntax:
+
+~~~powershell
+az login
+az account set --subscription "<subscription name or ID>"
+$env:ARM_SUBSCRIPTION_ID = az account show --query id --output tsv
+~~~
+
 ## 2. Bootstrap state
 
-From the starter repository:
+From the starter repository on Windows PowerShell:
+
+~~~powershell
+.\scripts\bootstrap-state.ps1 -Location eastus -StateResourceGroup rg-stellar-tfstate -StorageAccount ststellaryouruniqueid -Container tfstate
+~~~
+
+On macOS or another Bash environment:
 
 ```bash
 ./scripts/bootstrap-state.sh \

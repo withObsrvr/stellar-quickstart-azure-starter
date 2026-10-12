@@ -42,6 +42,13 @@ az login
 ./scripts/bootstrap-state.sh eastus
 ```
 
+On Windows PowerShell, use the native script instead:
+
+~~~powershell
+az login
+.\scripts\bootstrap-state.ps1 -Location eastus
+~~~
+
 Creates the state resource group, storage account, and container; grants you
 blob access; writes `backend.hcl`. **Commit `backend.hcl`** (no secrets in it).
 
@@ -57,6 +64,12 @@ terraform apply tfplan
 
 Commit the generated `.terraform.lock.hcl` so local and pipeline runs select
 the same provider version.
+
+In PowerShell, set the subscription environment variable with:
+
+~~~powershell
+$env:ARM_SUBSCRIPTION_ID = az account show --query id --output tsv
+~~~
 
 ### 4. Create the service connection (once)
 

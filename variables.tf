@@ -105,6 +105,12 @@ variable "stellar_network" {
   default     = "local"
 }
 
+variable "quickstart_image" {
+  description = "Stellar Quickstart container image; override with an ACR mirror to avoid public-registry pull limits"
+  type        = string
+  default     = "stellar/quickstart:latest"
+}
+
 variable "container_cpu" {
   description = "vCPUs for the container group (use 4 for testnet/futurenet)"
   type        = number

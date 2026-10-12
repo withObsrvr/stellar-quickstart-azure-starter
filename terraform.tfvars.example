@@ -22,5 +22,6 @@ environment = "sandbox"
 # dns_name_label = "stellar-demo-your-company"
 
 # stellar_network  = "local"
+# quickstart_image = "stellar/quickstart:latest"
 # container_cpu    = 2
 # container_memory = 8
